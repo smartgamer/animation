@@ -1,9 +1,10 @@
 
 #animation with gganimate
 #gganimate: Create Animations with ggplot2
-#http://www.sthda.com/english/articles/print/58-gganimate-create-animations-with-ggplot2/
+#https://github.com/thomasp85/gganimate/wiki
 # https://www.r-bloggers.com/gganimation-for-the-nation/
 #https://github.com/thomasp85/gganimate
+
 
 # gganimate extends the grammar of graphics as implemented by ggplot2 to include the description of animation. It does this by providing a range of new grammar classes that can be added to the plot object in order to customise how it should change with time.
 
@@ -77,3 +78,68 @@ ggplot(mtcars) +
 ggplot(mtcars) + 
   geom_boxplot(aes(factor(cyl), mpg)) + 
   transition_manual(gear)
+
+
+# https://github.com/thomasp85/gganimate/wiki/Temperature-time-series
+airq <- airquality
+airq$Month <- format(ISOdate(2004,1:12,1),"%B")[airq$Month]
+ggplot(airq, aes(Day, Temp, group = Month)) + 
+  geom_line() + 
+  geom_segment(aes(xend = 31, yend = Temp), linetype = 2, colour = 'grey') + 
+  geom_point(size = 2) + 
+  geom_text(aes(x = 31.1, label = Month), hjust = 0) + 
+  transition_reveal(Day) + 
+  coord_cartesian(clip = 'off') + 
+  labs(title = 'Temperature in New York', y = 'Temperature (°F)') + 
+  theme_minimal() + 
+  theme(plot.margin = margin(5.5, 40, 5.5, 5.5))
+
+
+
+###https://www.r-bloggers.com/gganimate-animate-your-security-analysis/
+#https://github.com/holisticinfosec/gganimate-Animate-YouR-Security-Analysis
+# Security Incidents Time Series
+incidents <- read.csv("incidents.csv")
+incidents$Month <- format(ISOdate(2004,1:12,1),"%B")[incidents$Month]
+Day=incidents$Day
+p <- ggplot(incidents, aes(Day, Inc_Cnt, group = Month)) + 
+  geom_line(aes(colour=Month)) + 
+  geom_segment(aes(xend = 31, yend = Inc_Cnt), linetype = 2, colour = 'blue') + 
+  geom_point(size = 2) + 
+  geom_text(aes(x = 31.1, label = Month), hjust = 0, colour = 'brown') + 
+  transition_reveal(Month, Day) + 
+  coord_cartesian(clip = 'off') + 
+  labs(title = 'Incident Counts by Day - AUG through DEC', y = 'Incident Count') + 
+  theme_minimal() + 
+  theme(plot.margin = margin(5.5, 40, 5.5, 5.5)) +
+  theme(legend.position='none')
+p + anim_save("incidentTS.gif", animation = last_animation())
+
+
+
+
+
+library(ggplot2)
+library(gganimate)
+library(tibble)
+
+data <- read.csv("SDL.csv")
+sdl_data <- as_data_frame(data)
+
+options(scipen=10000)
+dev.off(which = dev.prev())
+
+ggplot(sdl_data, aes(bugs, regressions, size = code, colour = apps)) +
+  geom_point(alpha = 0.7) +
+  scale_colour_manual(values = rainbow(n=142)) +
+  scale_size(range = c(2, 12)) +
+  scale_x_log10() +
+  facet_wrap(~OS) +
+  theme(legend.position = 'none') +
+  labs(title = 'Year: {frame_time}', x = 'Bugs', y = 'Regressions', 
+       subtitle = "Ten Years of SDL") +
+  transition_time(year)
+
+
+
+
